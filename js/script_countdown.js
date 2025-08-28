@@ -2,13 +2,12 @@ let timer;
 let totalSeconds = 0;
 let isRunning = false;
 let isEditing = false;
-let timeoutId;
+let hundredth = 0;
 
 const minutesSpan = document.getElementById('minutes');
 const secondsSpan = document.getElementById('seconds');
-const timerDisplay = document.getElementById('timer-display');
+const hundredthSpan = document.getElementById('hundredth');
 const editButton = document.getElementById('edit-button');
-const controlsContainer = document.querySelector('.controls');
 
 // Funzione per aggiornare il display del timer
 function updateDisplay() {
@@ -16,6 +15,7 @@ function updateDisplay() {
     const seconds = totalSeconds % 60;
     minutesSpan.textContent = String(minutes).padStart(1, '0');
     secondsSpan.textContent = String(seconds).padStart(2, '0');
+    hundredthSpan.textContent = String(hundredth).padStart(2, '0');
 }
 
 // Funzione per avviare il timer
@@ -23,14 +23,23 @@ function startTimer() {
     if (isRunning || isEditing) return;
     isRunning = true;
     timer = setInterval(() => {
-        if (totalSeconds <= 0) {
+        hundredth--;
+
+        if (hundredth < 0) {
+            hundredth = 99;
+            totalSeconds--;
+        }
+
+        if (totalSeconds <= 0 && hundredth <= 0) {
             clearInterval(timer);
             isRunning = false;
+            hundredth = 0;
+            totalSeconds = 0;
+            updateDisplay();
             return;
         }
-        totalSeconds--;
         updateDisplay();
-    }, 1000);
+    }, 10);
 }
 
 // Funzione per mettere in pausa il timer
@@ -40,20 +49,6 @@ function pauseTimer() {
     isRunning = false;
 }
 
-// Funzione per mostrare i controlli
-function showControls() {
-    clearTimeout(timeoutId);
-    controlsContainer.classList.remove('hidden');
-    timeoutId = setTimeout(hideControls, 3000);
-}
-
-// Funzione per nascondere i controlli (aggiunta per chiarezza)
-function hideControls() {
-    if (!isEditing) {
-        controlsContainer.classList.add('hidden');
-    }
-}
-
 // Funzione per attivare la modalità di modifica
 function enableEditing() {
     pauseTimer();
@@ -61,7 +56,6 @@ function enableEditing() {
     minutesSpan.contentEditable = 'true';
     secondsSpan.contentEditable = 'true';
     minutesSpan.focus();
-    showControls();
 }
 
 // Funzione per disattivare la modalità di modifica
@@ -72,25 +66,22 @@ function disableEditing() {
     const minutes = parseInt(minutesSpan.textContent) || 0;
     const seconds = parseInt(secondsSpan.textContent) || 0;
 
-    // Gestisce il caso in cui i secondi siano maggiori di 59
     const newSeconds = seconds % 60;
     const addedMinutes = Math.floor(seconds / 60);
 
     totalSeconds = ((minutes + addedMinutes) * 60) + newSeconds;
+    hundredth = 0;
     updateDisplay();
-    hideControls();
 }
+
 
 // Funzione per resettare il timer
 function resetTimer() {
     pauseTimer();
     totalSeconds = 0;
+    hundredth = 0;
     updateDisplay();
 }
-
-// Event listeners per la visibilità dei controlli
-document.addEventListener('mousemove', showControls);
-document.addEventListener('keydown', showControls);
 
 // Event listener per il pulsante "Modifica"
 if (editButton) {
@@ -99,7 +90,6 @@ if (editButton) {
 
 // Event listeners per uscire dalla modalità di modifica
 minutesSpan.addEventListener('blur', (event) => {
-    // Se il focus si sposta su un altro elemento modificabile, non disabilitare l'editing
     if (event.relatedTarget === secondsSpan) {
         return;
     }
@@ -107,7 +97,6 @@ minutesSpan.addEventListener('blur', (event) => {
 });
 
 secondsSpan.addEventListener('blur', (event) => {
-    // Se il focus si sposta su un altro elemento modificabile, non disabilitare l'editing
     if (event.relatedTarget === minutesSpan) {
         return;
     }
@@ -116,10 +105,8 @@ secondsSpan.addEventListener('blur', (event) => {
 
 // Gestione dei tasti
 document.addEventListener('keydown', (event) => {
-    // Esci dalla modalità di modifica con il tasto Invio
     if (isEditing && event.key === 'Enter') {
         event.preventDefault();
-        // Sposta il focus da un elemento all'altro prima di uscire
         if (document.activeElement === minutesSpan) {
             secondsSpan.focus();
         } else {
@@ -128,28 +115,21 @@ document.addEventListener('keydown', (event) => {
         return;
     }
 
-    // Le scorciatoie funzionano solo se non si è in modalità di modifica
     if (!isEditing) {
         if (event.code === 'Space') {
             event.preventDefault();
             if (isRunning) {
                 pauseTimer();
             } else {
-                if (totalSeconds > 0) {
+                if (totalSeconds > 0 || hundredth > 0) {
                     startTimer();
                 }
             }
         }
 
-        // Tasti preimpostati
         const presets = {
-            'a': 60,
-            's': 120,
-            'd': 180,
-            'f': 300,
-            'q': 600,
-            'w': 900,
-            'e': 30,
+            'a': 60, 's': 120, 'd': 180, 'f': 300,
+            'q': 600, 'w': 900, 'e': 30,
         };
 
         const key = event.key.toLowerCase();
@@ -157,10 +137,10 @@ document.addEventListener('keydown', (event) => {
             event.preventDefault();
             pauseTimer();
             totalSeconds = presets[key];
+            hundredth = 0;
             updateDisplay();
         }
 
-        // Tasto 'R' per reset
         if (key === 'r') {
             event.preventDefault();
             resetTimer();
@@ -169,13 +149,16 @@ document.addEventListener('keydown', (event) => {
 });
 
 // Aggiungi un event listener per il click su tutto lo schermo
-document.body.addEventListener('click', () => {
+document.body.addEventListener('click', (event) => {
+    if (event.target.closest('a')) {
+        return;
+    }
+
     if (!isEditing) {
         if (isRunning) {
             pauseTimer();
         } else {
-            // Controlla se il timer ha un valore prima di avviarlo
-            if (totalSeconds > 0) {
+            if (totalSeconds > 0 || hundredth > 0) {
                 startTimer();
             }
         }
@@ -184,13 +167,11 @@ document.body.addEventListener('click', () => {
 
 // Aggiungi un event listener per il doppio click su tutto lo schermo
 document.body.addEventListener('dblclick', (event) => {
-    // Previene il comportamento predefinito del doppio click, come la selezione del testo
     event.preventDefault();
     if (!isEditing) {
         resetTimer();
     }
 });
 
-// Inizializza il display e i controlli
+// Inizializza il display
 updateDisplay();
-showControls();

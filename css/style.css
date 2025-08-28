@@ -13,14 +13,13 @@ body {
     height: 100vh;
     width:100vw;
     margin: 0;
-    cursor: pointer #555; /* Change cursor to indicate clickability */
 }
 
 #timer-display {
     font-size: 15em;
     font-weight: bold;
-    display: flex; /* Use flexbox to control spacing between children */
-    user-select: none; /* Prevents text selection */
+    display: flex;
+    user-select: none;
     line-height: 1; /*maggiore controllo sulla spaziatura verticale */
 }
 
@@ -40,7 +39,7 @@ body {
     border-bottom: 2px solid #555; /* Underline on focus */
 }
 
-.controls {
+.edit-controls {
     position: absolute;
     bottom: 20px;
     right: 20px;
@@ -49,6 +48,7 @@ body {
 #edit-button {
     background-color: transparent;
     border-style: none;
+    margin: 5px;
     width: 40px;
     height: 40px;
     font-size: 1.5em;
@@ -56,4 +56,36 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.watch-setting {
+    position: absolute;
+    right: 20px;
+    align-items: center;
+}
+
+#timer-button {
+    background-color: transparent;
+    margin: 5px;
+    width: 45px;
+    height: 45px;
+    font-style: 1.5em;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.lap-times-container {
+/*    border: 2px solid red; */
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    height: 250px;
+    width: 130px;
+}
+
+.lap-times-container h2 {
+    text-align: center;
+    border-bottom: 2px solid red;
 }
