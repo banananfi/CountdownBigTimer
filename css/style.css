@@ -5,13 +5,13 @@
 
 body {
     background-color: #000000;
-	font-family:"CPmono";
+	  font-family:"CPmono";
     color: red;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
-	width:100vw;
+    width:100vw;
     margin: 0;
     cursor: pointer #555; /* Change cursor to indicate clickability */
 }
@@ -19,9 +19,9 @@ body {
 #timer-display {
     font-size: 15em;
     font-weight: bold;
-	display: flex; /* Use flexbox to control spacing between children */
+    display: flex; /* Use flexbox to control spacing between children */
     user-select: none; /* Prevents text selection */
-	line-height: 1; /*maggiore controllo sulla spaziatura verticale */
+    line-height: 1; /*maggiore controllo sulla spaziatura verticale */
 }
 
 .separator {
@@ -44,29 +44,16 @@ body {
     position: absolute;
     bottom: 20px;
     right: 20px;
-    opacity: 1;
-    transition: opacity 0.3s ease-in-out;
-}
-
-.controls.hidden {
-    opacity: 0;
-    pointer-events: none; /* Impedisce il click quando è nascosto */
 }
 
 #edit-button {
     background-color: transparent;
-    color: red;
-    border: 2px solid red;
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
+    border-style: none;
+    width: 40px;
+    height: 40px;
     font-size: 1.5em;
     cursor: pointer;
     display: flex;
     justify-content: center;
     align-items: center;
-}
-
-#edit-button:hover {
-    background-color: rgba(255, 0, 0, 0.2);
 }

@@ -72,6 +72,7 @@ function disableEditing() {
     const minutes = parseInt(minutesSpan.textContent) || 0;
     const seconds = parseInt(secondsSpan.textContent) || 0;
 
+    // Gestisce il caso in cui i secondi siano maggiori di 59
     const newSeconds = seconds % 60;
     const addedMinutes = Math.floor(seconds / 60);
 
@@ -91,6 +92,7 @@ if (editButton) {
 
 // Event listeners per uscire dalla modalità di modifica
 minutesSpan.addEventListener('blur', (event) => {
+    // Se il focus si sposta su un altro elemento modificabile, non disabilitare l'editing
     if (event.relatedTarget === secondsSpan) {
         return;
     }
@@ -98,43 +100,19 @@ minutesSpan.addEventListener('blur', (event) => {
 });
 
 secondsSpan.addEventListener('blur', (event) => {
+    // Se il focus si sposta su un altro elemento modificabile, non disabilitare l'editing
     if (event.relatedTarget === minutesSpan) {
         return;
     }
     disableEditing();
 });
 
-// Aggiungi la nuova logica per il click su tutto il documento
-document.addEventListener('click', () => {
-    if (!isEditing) {
-        if (isRunning) {
-            pauseTimer();
-        } else {
-            const minutes = parseInt(minutesSpan.textContent) || 0;
-            const seconds = parseInt(secondsSpan.textContent) || 0;
-            totalSeconds = (minutes * 60) + seconds;
-            if (totalSeconds > 0) {
-                startTimer();
-            }
-        }
-    }
-});
-
-// Aggiungi la nuova logica per il doppio click su tutto il documento
-document.addEventListener('dblclick', (event) => {
-    // Evita il doppio click quando si fa doppio click sul pulsante "modifica"
-    if (event.target !== editButton && !isEditing) {
-        event.preventDefault();
-        pauseTimer();
-        totalSeconds = 0;
-        updateDisplay();
-    }
-});
-
 // Gestione dei tasti
 document.addEventListener('keydown', (event) => {
+    // Esci dalla modalità di modifica con il tasto Invio
     if (isEditing && event.key === 'Enter') {
         event.preventDefault();
+        // Sposta il focus da un elemento all'altro prima di uscire
         if (document.activeElement === minutesSpan) {
             secondsSpan.focus();
         } else {
@@ -143,6 +121,7 @@ document.addEventListener('keydown', (event) => {
         return;
     }
 
+    // Le scorciatoie funzionano solo se non si è in modalità di modifica
     if (!isEditing) {
         if (event.code === 'Space') {
             event.preventDefault();
@@ -158,6 +137,7 @@ document.addEventListener('keydown', (event) => {
             }
         }
 
+        // Tasti preimpostati
         const presets = {
             'a': 60,
             's': 120,
@@ -176,6 +156,7 @@ document.addEventListener('keydown', (event) => {
             updateDisplay();
         }
 
+        // Tasto 'R' per reset
         if (key === 'r') {
             event.preventDefault();
             pauseTimer();
