@@ -40,18 +40,18 @@ function pauseTimer() {
     isRunning = false;
 }
 
-// Funzione per nascondere i controlli
-function hideControls() {
-    if (!isEditing) {
-        controlsContainer.classList.add('hidden');
-    }
-}
-
 // Funzione per mostrare i controlli
 function showControls() {
     clearTimeout(timeoutId);
     controlsContainer.classList.remove('hidden');
     timeoutId = setTimeout(hideControls, 3000);
+}
+
+// Funzione per nascondere i controlli (aggiunta per chiarezza)
+function hideControls() {
+    if (!isEditing) {
+        controlsContainer.classList.add('hidden');
+    }
 }
 
 // Funzione per attivare la modalità di modifica
@@ -79,6 +79,13 @@ function disableEditing() {
     totalSeconds = ((minutes + addedMinutes) * 60) + newSeconds;
     updateDisplay();
     hideControls();
+}
+
+// Funzione per resettare il timer
+function resetTimer() {
+    pauseTimer();
+    totalSeconds = 0;
+    updateDisplay();
 }
 
 // Event listeners per la visibilità dei controlli
@@ -128,9 +135,6 @@ document.addEventListener('keydown', (event) => {
             if (isRunning) {
                 pauseTimer();
             } else {
-                const minutes = parseInt(minutesSpan.textContent) || 0;
-                const seconds = parseInt(secondsSpan.textContent) || 0;
-                totalSeconds = (minutes * 60) + seconds;
                 if (totalSeconds > 0) {
                     startTimer();
                 }
@@ -159,10 +163,31 @@ document.addEventListener('keydown', (event) => {
         // Tasto 'R' per reset
         if (key === 'r') {
             event.preventDefault();
-            pauseTimer();
-            totalSeconds = 0;
-            updateDisplay();
+            resetTimer();
         }
+    }
+});
+
+// Aggiungi un event listener per il click su tutto lo schermo
+document.body.addEventListener('click', () => {
+    if (!isEditing) {
+        if (isRunning) {
+            pauseTimer();
+        } else {
+            // Controlla se il timer ha un valore prima di avviarlo
+            if (totalSeconds > 0) {
+                startTimer();
+            }
+        }
+    }
+});
+
+// Aggiungi un event listener per il doppio click su tutto lo schermo
+document.body.addEventListener('dblclick', (event) => {
+    // Previene il comportamento predefinito del doppio click, come la selezione del testo
+    event.preventDefault();
+    if (!isEditing) {
+        resetTimer();
     }
 });
 
