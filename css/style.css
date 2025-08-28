@@ -66,9 +66,29 @@ body {
 
 #timer-button {
     background-color: transparent;
+    border-style: none;
     margin: 5px;
     width: 45px;
     height: 45px;
+    font-style: 1.5em;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.save-lap-times {
+/*    border: 2px solid red;*/
+    position: absolute;
+    bottom: 200px;
+    justify-content: center;
+}
+
+#lap-times-button {
+    background-color: transparent;
+    border-style: none;
+    width: 100px;
+    height: 100px;
     font-style: 1.5em;
     cursor: pointer;
     display: flex;

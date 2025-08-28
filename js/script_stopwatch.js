@@ -9,6 +9,7 @@ const minutesSpan = document.getElementById('minutes');
 const secondsSpan = document.getElementById('seconds');
 const hundredthSpan = document.getElementById('hundredth');
 const lapTimesTable = document.getElementById('lap-times-table');
+const lapTimesButton = document.getElementById('lap-times-button');
 
 // Function to update the timer display
 function updateDisplay() {
@@ -37,7 +38,7 @@ function pauseStopwatch() {
     isRunning = false;
     clearInterval(timer);
     elapsedPauseTime += Date.now() - startTime;
-    saveLapTime(); // Save lap time when the timer is stopped
+    saveLapTime(); // Saves lap time when the timer is paused
 }
 
 // Function to reset the stopwatch
@@ -95,6 +96,12 @@ document.body.addEventListener('dblclick', (event) => {
 
 document.body.addEventListener('contextmenu', (event) => {
     event.preventDefault();
+    if (isRunning) {
+        saveLapTime();
+    }
+});
+
+lapTimesButton.addEventListener('click', () => {
     if (isRunning) {
         saveLapTime();
     }
