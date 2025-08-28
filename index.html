@@ -3,15 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Click-to-Start Countdown</title>
+    <title>Countdown Big Timer</title>
     <link rel="stylesheet" href="./css/style.css" type="text/css">
-</head>
+    <link rel="icon" type="image/png" href="./images/stopwatch.png">
+
 <body>
     <div id="timer-display">
-        <span id="minutes" contenteditable="true">00</span>
+        <span id="minutes">00</span>
         <span class="separator">:</span>
-        <span id="seconds" contenteditable="true">00</span>
+        <span id="seconds">00</span>
     </div>
+    <div class="controls">
+    <button id="edit-button">
+        <i class="fas fa-pencil-alt"></i>
+    </button>
+</div>
     <script src="js/script.js" type="text/javascript"></script>
 </body>
 </html>

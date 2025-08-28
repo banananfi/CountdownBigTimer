@@ -26,17 +26,47 @@ body {
 
 .separator {
     color: red;
-	margin: 0 -0.10em; /* Aggiunge un margine negativo per ridurre lo spazio */
-    /*margin: 0 3px;
+	  margin: 0 -0.10em; /* Aggiunge un margine negativo per ridurre lo spazio */
 }
 
 /* Style for editable numbers */
 #minutes, #seconds {
     display: inline;
-    border-bottom: 2px solid transparent; /* A transparent border to use as an underline */
+    border-bottom: 2px solid transparent;
 }
 
 #minutes:focus, #seconds:focus {
     outline: none;
     border-bottom: 2px solid #555; /* Underline on focus */
+}
+
+.controls {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    opacity: 1;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.controls.hidden {
+    opacity: 0;
+    pointer-events: none; /* Impedisce il click quando è nascosto */
+}
+
+#edit-button {
+    background-color: transparent;
+    color: red;
+    border: 2px solid red;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    font-size: 1.5em;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#edit-button:hover {
+    background-color: rgba(255, 0, 0, 0.2);
 }
