@@ -16,7 +16,7 @@ body {
 }
 
 #timer-display {
-    font-size: 15em;
+    font-size: 20vw;
     font-weight: bold;
     display: flex;
     user-select: none;
@@ -60,8 +60,8 @@ body {
 
 .watch-setting {
     position: absolute;
+    top: 20px;
     right: 20px;
-    align-items: center;
 }
 
 #timer-button {
@@ -94,6 +94,12 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+@media (pointer: fine) {
+    .save-lap-times {
+        display: none;
+    }
 }
 
 .lap-times-container {

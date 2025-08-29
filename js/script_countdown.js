@@ -1,52 +1,111 @@
-let timer;
+let timerId;
 let totalSeconds = 0;
 let isRunning = false;
 let isEditing = false;
-let hundredth = 0;
 
 const minutesSpan = document.getElementById('minutes');
 const secondsSpan = document.getElementById('seconds');
 const hundredthSpan = document.getElementById('hundredth');
 const editButton = document.getElementById('edit-button');
+const separatorColon = document.querySelector('#timer-display .separator:nth-child(2)'); // the ":" separator
+const separatorDot = document.querySelector('#timer-display .separator:nth-child(4)'); // the "." separator
+
+let endTime = 0; // timestamp when countdown ends
 
 // Funzione per aggiornare il display del timer
-function updateDisplay() {
-    const minutes = Math.floor(totalSeconds / 60);
-    const seconds = totalSeconds % 60;
+function updateDisplayFromMilliseconds(msRemaining) {
+    if (msRemaining < 0) msRemaining = 0;
+
+    const totalHundredths = Math.floor(msRemaining / 10);
+    const minutes = Math.floor(totalHundredths / 6000);
+    const seconds = Math.floor((totalHundredths % 6000) / 100);
+    const hundredth = totalHundredths % 100;
+
     minutesSpan.textContent = String(minutes).padStart(1, '0');
     secondsSpan.textContent = String(seconds).padStart(2, '0');
     hundredthSpan.textContent = String(hundredth).padStart(2, '0');
+
+    // Show/hide logic for minutes, colon separator, hundredth, and dot separator
+    if (minutes === 0 && seconds === 0 && hundredth === 0) {
+        // Clock reset or reached zero: show minutes and colon, hide hundredth and dot
+        minutesSpan.style.display = '';
+        separatorColon.style.display = '';
+        hundredthSpan.style.display = 'none';
+        separatorDot.style.display = 'none';
+    } else if (minutes > 0) {
+        // Minutes not zero: show minutes and colon, hide hundredth and dot
+        minutesSpan.style.display = '';
+        separatorColon.style.display = '';
+        hundredthSpan.style.display = 'none';
+        separatorDot.style.display = 'none';
+    } else {
+        // Minutes zero: hide minutes and colon, show hundredth and dot
+        minutesSpan.style.display = 'none';
+        separatorColon.style.display = 'none';
+        hundredthSpan.style.display = '';
+        separatorDot.style.display = '';
+    }
+}
+
+// Funzione per aggiornare il display in base a totalSeconds e hundredth (usata per editing and presets)
+function updateDisplay() {
+    // Convert totalSeconds and hundredth to milliseconds
+    const msRemaining = (totalSeconds * 1000) + (hundredthSpan.style.display === 'none' ? 0 : 0);
+    updateDisplayFromMilliseconds(msRemaining);
 }
 
 // Funzione per avviare il timer
 function startTimer() {
     if (isRunning || isEditing) return;
+    if (totalSeconds <= 0) return;
+
     isRunning = true;
-    timer = setInterval(() => {
-        hundredth--;
+    endTime = performance.now() + totalSeconds * 1000;
 
-        if (hundredth < 0) {
-            hundredth = 99;
-            totalSeconds--;
-        }
+    function tick() {
+        if (!isRunning) return;
 
-        if (totalSeconds <= 0 && hundredth <= 0) {
-            clearInterval(timer);
+        const now = performance.now();
+        let msRemaining = endTime - now;
+
+        if (msRemaining <= 0) {
+            msRemaining = 0;
             isRunning = false;
-            hundredth = 0;
-            totalSeconds = 0;
-            updateDisplay();
-            return;
         }
-        updateDisplay();
-    }, 10);
+
+        updateDisplayFromMilliseconds(msRemaining);
+
+        if (isRunning) {
+            timerId = requestAnimationFrame(tick);
+        } else {
+            // Timer finished, reset totalSeconds and hundredth
+            totalSeconds = 0;
+            hundredthSpan.textContent = '00';
+            minutesSpan.style.display = '';
+            separatorColon.style.display = '';
+            hundredthSpan.style.display = 'none';
+            separatorDot.style.display = 'none';
+        }
+    }
+
+    timerId = requestAnimationFrame(tick);
 }
 
 // Funzione per mettere in pausa il timer
 function pauseTimer() {
     if (!isRunning) return;
-    clearInterval(timer);
     isRunning = false;
+    if (timerId) {
+        cancelAnimationFrame(timerId);
+        timerId = null;
+    }
+    // Update totalSeconds based on remaining time
+    const now = performance.now();
+    let msRemaining = endTime - now;
+    if (msRemaining < 0) msRemaining = 0;
+    totalSeconds = Math.floor(msRemaining / 1000);
+    // hundredth is not used separately now, so no update needed
+    updateDisplayFromMilliseconds(msRemaining);
 }
 
 // Funzione per attivare la modalità di modifica
@@ -70,17 +129,14 @@ function disableEditing() {
     const addedMinutes = Math.floor(seconds / 60);
 
     totalSeconds = ((minutes + addedMinutes) * 60) + newSeconds;
-    hundredth = 0;
-    updateDisplay();
+    updateDisplayFromMilliseconds(totalSeconds * 1000);
 }
-
 
 // Funzione per resettare il timer
 function resetTimer() {
     pauseTimer();
     totalSeconds = 0;
-    hundredth = 0;
-    updateDisplay();
+    updateDisplayFromMilliseconds(0);
 }
 
 // Event listener per il pulsante "Modifica"
@@ -121,7 +177,7 @@ document.addEventListener('keydown', (event) => {
             if (isRunning) {
                 pauseTimer();
             } else {
-                if (totalSeconds > 0 || hundredth > 0) {
+                if (totalSeconds > 0) {
                     startTimer();
                 }
             }
@@ -137,8 +193,7 @@ document.addEventListener('keydown', (event) => {
             event.preventDefault();
             pauseTimer();
             totalSeconds = presets[key];
-            hundredth = 0;
-            updateDisplay();
+            updateDisplayFromMilliseconds(totalSeconds * 1000);
         }
 
         if (key === 'r') {
@@ -158,7 +213,7 @@ document.body.addEventListener('click', (event) => {
         if (isRunning) {
             pauseTimer();
         } else {
-            if (totalSeconds > 0 || hundredth > 0) {
+            if (totalSeconds > 0) {
                 startTimer();
             }
         }
@@ -174,4 +229,4 @@ document.body.addEventListener('dblclick', (event) => {
 });
 
 // Inizializza il display
-updateDisplay();
+updateDisplayFromMilliseconds(totalSeconds * 1000);

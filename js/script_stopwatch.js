@@ -11,6 +11,11 @@ const hundredthSpan = document.getElementById('hundredth');
 const lapTimesTable = document.getElementById('lap-times-table');
 const lapTimesButton = document.getElementById('lap-times-button');
 
+// Assuming the separators are siblings of the spans inside the timer display container
+const timerDisplay = document.getElementById('timer-display');
+const separatorColon = timerDisplay.querySelector('.separator:nth-child(2)'); // ":" separator
+const separatorDot = timerDisplay.querySelector('.separator:nth-child(4)');   // "." separator
+
 // Function to update the timer display
 function updateDisplay() {
     const elapsedMilliseconds = isRunning ? (Date.now() - startTime + elapsedPauseTime) : elapsedPauseTime;
@@ -19,9 +24,25 @@ function updateDisplay() {
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = totalSeconds % 60;
     const hundredths = Math.floor((elapsedMilliseconds % 1000) / 10);
+
     minutesSpan.textContent = String(minutes).padStart(2, '0');
     secondsSpan.textContent = String(seconds).padStart(2, '0');
     hundredthSpan.textContent = String(hundredths).padStart(2, '0');
+
+    // Show/hide logic:
+    if (minutes === 0) {
+        // Hide minutes and colon, show seconds.hundredths with dot
+        minutesSpan.style.display = 'none';
+        separatorColon.style.display = 'none';
+        hundredthSpan.style.display = '';
+        separatorDot.style.display = '';
+    } else {
+        // Show minutes and colon, show hundredths and dot
+        minutesSpan.style.display = '';
+        separatorColon.style.display = '';
+        hundredthSpan.style.display = '';
+        separatorDot.style.display = '';
+    }
 }
 
 // Function to start the stopwatch
@@ -39,6 +60,7 @@ function pauseStopwatch() {
     clearInterval(timer);
     elapsedPauseTime += Date.now() - startTime;
     saveLapTime(); // Saves lap time when the timer is paused
+    updateDisplay(); // Ensure display updates immediately after pause
 }
 
 // Function to reset the stopwatch
